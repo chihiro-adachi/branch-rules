@@ -1,18 +1,21 @@
-name: Check PR Title
+name: "Lint PR"
 
 on:
-  pull_request:
-    types: [opened, edited, synchronize, reopend]
+  pull_request_target:
+    types:
+      - opened
+      - edited
+      - synchronize
+      - reopened
+
+permissions:
+  pull-requests: read
 
 jobs:
-  check-title:
+  main:
+    name: Validate PR title
     runs-on: ubuntu-latest
     steps:
-      - name: Check PR title
-        id: check_pr_title
-        run: |
-          PR_TITLE="${{ github.event.pull_request.title }}"
-          if [[ ! "$PR_TITLE" =~ ^(Merge (remote-tracking )?branch '.*' into \w+)|^(build|chore|ci|docs|feat|fix|perf|refactor|revert|lint|style|test|debug){1}(\([\w\-\.]+\))?(!)?: ([\w ])+([\s\S]*) ]]; then
-            echo "Commit message must follow the Conventional Commit - https://www.conventionalcommits.org/en/v1.0.0/"
-            exit 1
-          fi
+      - uses: amannn/action-semantic-pull-request@v5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
