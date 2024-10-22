@@ -1,0 +1,18 @@
+name: Check PR Title
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopend]
+
+jobs:
+  check-title:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check PR title
+        id: check_pr_title
+        run: |
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          if [[ ! "$PR_TITLE" =~ ^(Merge\ (remote-tracking\ )?branch\ \'.*\'\ into\ \w+)|^(build|chore|ci|docs|feat|fix|perf|refactor|revert|lint|style|test|debug){1}(\([\w\-\.]+\))?(!)?:\ ([\w\ ])+([\s\S]*) ]]; then
+            echo "Commit message must follow the Conventional Commit - https://www.conventionalcommits.org/en/v1.0.0/"
+            exit 1
+          fi
